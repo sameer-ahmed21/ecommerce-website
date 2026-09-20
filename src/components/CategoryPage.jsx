@@ -1,23 +1,27 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SlidersHorizontal, ChevronRight, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Footer from './Footer.jsx';
-
-const allProducts = [
-  { id: '1', name: 'Gradient Graphic T-shirt', price: 145, rating: 3.5, image: '/products/arrival 1.png' },
-  { id: '2', name: 'Polo with Tipping Details', price: 180, rating: 4.5, image: '/products/arrival 2.png' },
-  { id: '3', name: 'Black Striped T-shirt', price: 120, originalPrice: 150, discount: '-30%', rating: 5.0, image: '/products/arrival 3.png' },
-  { id: '4', name: 'SKINNY FIT JEANS', price: 240, originalPrice: 260, discount: '-20%', rating: 3.5, image: '/products/arrival 4.png' },
-  { id: '5', name: 'CHECKERED SHIRT', price: 180, rating: 4.5, image: '/products/topsellng1.png' },
-  { id: '6', name: 'SLEEVE STRIPED T-SHIRT', price: 130, originalPrice: 160, discount: '-30%', rating: 4.5, image: '/products/topsellng2.png' },
-  { id: '7', name: 'VERTICAL STRIPED SHIRT', price: 212, originalPrice: 232, discount: '-20%', rating: 5.0, image: '/products/topsellng3.png' },
-  { id: '8', name: 'COURAGE GRAPHIC T-SHIRT', price: 145, rating: 4.0, image: '/products/topsellng4.png' },
-  { id: '9', name: 'LOOSE FIT BERMUDA SHORTS', price: 80, rating: 3.0, image: '/products/arrival 1.png' }
-];
+import { API_BASE_URL } from '../config/api';
 
 export default function CategoryPage() {
   const [selectedCategory, setSelectedCategory] = useState('Casual');
   const [priceRange, setPriceRange] = useState(200);
+  const [allProducts, setAllProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/products`)
+      .then((res) => res.json())
+      .then((data) => {
+        setAllProducts(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error('API Fetch Error:', err);
+        setLoading(false);
+      });
+  }, []);
 
   return (
     <div className="space-y-16 font-sans text-black">
@@ -85,7 +89,9 @@ export default function CategoryPage() {
           <div className="lg:col-span-9 space-y-6">
             <div className="flex justify-between items-end">
               <h1 className="text-3xl font-extrabold">{selectedCategory}</h1>
-              <span className="text-xs text-slate-500">Showing 1-9 of 100 Products</span>
+              <span className="text-xs text-slate-500">
+                {loading ? 'Loading...' : `Showing 1-${allProducts.length} of ${allProducts.length} Products`}
+              </span>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
