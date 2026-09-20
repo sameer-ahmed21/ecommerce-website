@@ -10,14 +10,27 @@ function isDnsSrvError(err) {
   return err && err.syscall === 'querySrv';
 }
 
-async function connectDB() {
+// On serverless platforms (Vercel) there's no long-lived process to exit out
+// of, and a warm function instance should reuse its existing connection
+// instead of reconnecting on every invocation - so exitOnFailure is
+// opt-out-able and an already-open connection short-circuits the function.
+async function connectDB({ exitOnFailure = true } = {}) {
+  if (mongoose.connection.readyState === 1) {
+    return;
+  }
+
   const uri = process.env.MONGODB_URI;
 
+  function fail(message, err) {
+    console.error(message, err ? err.message : '');
+    if (exitOnFailure) process.exit(1);
+    throw err || new Error(message);
+  }
+
   if (!uri) {
-    console.error(
+    fail(
       '\n[DB] MONGODB_URI is not set. Copy server/.env.example to server/.env and paste your connection string.\n'
     );
-    process.exit(1);
   }
 
   try {
@@ -26,8 +39,7 @@ async function connectDB() {
     return;
   } catch (err) {
     if (!isDnsSrvError(err)) {
-      console.error('[DB] Connection failed:', err.message);
-      process.exit(1);
+      fail('[DB] Connection failed:', err);
     }
   }
 
@@ -40,8 +52,7 @@ async function connectDB() {
     await mongoose.connect(uri);
     console.log(`[DB] Connected to MongoDB (${mongoose.connection.name})`);
   } catch (err) {
-    console.error('[DB] Connection failed:', err.message);
-    process.exit(1);
+    fail('[DB] Connection failed:', err);
   }
 }
 
