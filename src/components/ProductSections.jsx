@@ -1,11 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Star } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import { API_BASE_URL } from '../config/api';
 
 function ProductCard({ product }) {
   const { addToCart } = useCart();
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  const handleAddToCart = () => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+    addToCart(product, 1);
+  };
 
   return (
     <div className="group space-y-3 block">
@@ -55,7 +66,7 @@ function ProductCard({ product }) {
 
         <button
           type="button"
-          onClick={() => addToCart(product, 1)}
+          onClick={handleAddToCart}
           className="bg-black text-white text-xs font-semibold px-4 py-2 rounded-full hover:bg-slate-800 transition"
         >
           Add to Cart

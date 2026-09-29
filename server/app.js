@@ -1,44 +1,27 @@
 const express = require('express');
 const cors = require('cors');
 const Product = require('./models/Product');
+const productsRouter = require('./routes/products');
+const authRouter = require('./routes/auth');
+const usersRouter = require('./routes/users');
+const uploadRouter = require('./routes/upload');
 
 const app = express();
 
-app.use(express.json());
+// Raised from Express's 100kb default so a product body carrying a
+// base64-encoded uploaded image (see routes/upload.js) isn't rejected.
+app.use(express.json({ limit: '4mb' }));
 app.use(cors());
+
+app.use('/api/products', productsRouter);
+app.use('/api/auth', authRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/upload', uploadRouter);
 
 // NOTE: cart is still an in-memory array shared across all users — that's
 // tracked separately as ISSUES.md #1/#9 and is out of scope for this change,
 // which only moves the PRODUCT catalog onto the database.
 let cart = [];
-
-// 1. GET: All products, optionally filtered by category (?category=new-arrivals)
-app.get('/api/products', async (req, res) => {
-  try {
-    const filter = {};
-    if (req.query.category) filter.category = req.query.category;
-
-    const products = await Product.find(filter).sort({ createdAt: 1 });
-    res.json(products);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Failed to fetch products' });
-  }
-});
-
-// 2. GET: Single product by id (Mongo ObjectId)
-app.get('/api/products/:id', async (req, res) => {
-  try {
-    const product = await Product.findById(req.params.id);
-    if (!product) return res.status(404).json({ message: 'Product not found' });
-    res.json(product);
-  } catch (err) {
-    // Malformed ObjectId throws a CastError - treat it as "not found", not a 500.
-    if (err.name === 'CastError') return res.status(404).json({ message: 'Product not found' });
-    console.error(err);
-    res.status(500).json({ message: 'Failed to fetch product' });
-  }
-});
 
 // 3. GET: Fetch Cart State
 app.get('/api/cart', (req, res) => {

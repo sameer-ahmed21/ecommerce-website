@@ -1,17 +1,27 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingCart, Search, User } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
 export default function Navbar() {
   const context = useCart();
   const cartCount = context?.cartCount || 0;
+  const { user, isAuthenticated, isAdmin, logout } = useAuth();
+  const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const handleLogout = () => {
+    logout();
+    setMenuOpen(false);
+    navigate('/');
+  };
 
   return (
     <nav className="sticky top-0 z-50 bg-white border-b border-slate-200">
       <div className="bg-black text-white text-xs text-center py-2 px-4">
         Sign up and get 20% off to your first order.{' '}
-        <Link to="#" className="underline font-bold">
+        <Link to="/signup" className="underline font-bold">
           Sign Up Now
         </Link>
       </div>
@@ -54,9 +64,45 @@ export default function Navbar() {
               </span>
             )}
           </Link>
-          <button className="p-2 hover:bg-slate-100 rounded-full transition">
-            <User className="w-5 h-5 text-black" />
-          </button>
+          {isAuthenticated ? (
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setMenuOpen((o) => !o)}
+                className="p-2 hover:bg-slate-100 rounded-full transition"
+              >
+                <User className="w-5 h-5 text-black" />
+              </button>
+              {menuOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
+                  <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-2xl shadow-lg p-2 z-50 text-left">
+                    <p className="px-3 py-2 text-sm font-bold truncate">{user?.name}</p>
+                    {isAdmin && (
+                      <Link
+                        to="/admin"
+                        onClick={() => setMenuOpen(false)}
+                        className="block px-3 py-2 text-sm font-medium rounded-xl hover:bg-slate-100 transition"
+                      >
+                        Admin Dashboard
+                      </Link>
+                    )}
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="w-full text-left px-3 py-2 text-sm font-medium rounded-xl hover:bg-slate-100 transition text-red-500"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          ) : (
+            <Link to="/login" className="p-2 hover:bg-slate-100 rounded-full transition">
+              <User className="w-5 h-5 text-black" />
+            </Link>
+          )}
         </div>
       </div>
     </nav>
