@@ -3,4 +3,4 @@
 // the deployed backend in a production build (e.g. on Vercel).
 export const API_BASE_URL =
   import.meta.env.VITE_API_URL ||
-  (import.meta.env.DEV ? 'http://localhost:5000' : 'https://ecommerce-website-backend-two.vercel.app');
+  (import.meta.env.DEV ? 'http://localhost:5000' : 'https://ecommerce-website-backend-smoky.vercel.app');
