@@ -17,12 +17,8 @@ export default function Login() {
     setError('');
     setSubmitting(true);
     try {
-      const user = await login(email, password);
-      if (user.role === 'admin') {
-        navigate('/admin');
-      } else {
-        navigate(location.state?.from?.pathname || '/');
-      }
+      await login(email, password);
+      navigate(location.state?.from?.pathname || '/');
     } catch (err) {
       setError(err.message);
     } finally {

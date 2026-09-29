@@ -58,13 +58,17 @@ export default function ProductDetail() {
     );
   }
 
-  const handleAddToCart = (e) => {
+  const handleAddToCart = async (e) => {
     e.preventDefault();
     if (!isAuthenticated) {
       navigate('/login', { state: { from: location } });
       return;
     }
-    addToCart(product, quantity, selectedSize, selectedColor);
+    try {
+      await addToCart(product, quantity, selectedSize, selectedColor);
+    } catch (err) {
+      console.error('Failed to add to cart:', err);
+    }
   };
 
   const gallery = (product.images && product.images.length > 0) ? product.images : [product.image];

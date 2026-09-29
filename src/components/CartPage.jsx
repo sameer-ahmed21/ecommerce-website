@@ -37,7 +37,7 @@ export default function CartPage() {
         {/* Cart Items List */}
         <div className="lg:col-span-7 border border-slate-200 rounded-3xl p-4 sm:p-6 space-y-6 bg-white">
           {cart.map((item) => (
-            <div key={item.id} className="flex gap-4 pb-6 border-b border-slate-100 last:border-none last:pb-0">
+            <div key={item.cartItemId} className="flex gap-4 pb-6 border-b border-slate-100 last:border-none last:pb-0">
               <div className="w-24 h-24 bg-[#F0EEED] rounded-2xl overflow-hidden flex-shrink-0 p-2">
                 <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
               </div>
@@ -50,7 +50,7 @@ export default function CartPage() {
                     {item.color && <p className="text-xs text-slate-500">Color: <span className="text-black">{item.color}</span></p>}
                   </div>
                   <button
-                    onClick={() => removeFromCart(item.id)}
+                    onClick={() => removeFromCart(item.cartItemId)}
                     className="text-red-500 hover:text-red-700 transition p-1"
                   >
                     <Trash2 className="w-5 h-5" />
@@ -62,14 +62,14 @@ export default function CartPage() {
 
                   <div className="flex items-center bg-[#F0F0F0] rounded-full px-3 py-1 gap-4">
                     <button
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                      onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)}
                       className="text-black hover:opacity-60"
                     >
                       <Minus className="w-4 h-4" />
                     </button>
                     <span className="text-sm font-bold">{item.quantity}</span>
                     <button
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                      onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)}
                       className="text-black hover:opacity-60"
                     >
                       <Plus className="w-4 h-4" />

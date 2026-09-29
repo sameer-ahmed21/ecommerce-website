@@ -10,12 +10,16 @@ function ProductCard({ product }) {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!isAuthenticated) {
       navigate('/login');
       return;
     }
-    addToCart(product, 1);
+    try {
+      await addToCart(product, 1);
+    } catch (err) {
+      console.error('Failed to add to cart:', err);
+    }
   };
 
   return (
